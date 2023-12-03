@@ -35,8 +35,8 @@ namespace BizWebAPI.Areas.ERP.Repository.TaskManagement
                 string strResult = ex.Message.ToString();
                 throw new Exception(strResult);
             }
-        }  
-        
+        }
+
         internal async Task<IEnumerable<CmSystemUsers>> GetCompanyBranch(string userId)
         {
             try
@@ -54,7 +54,7 @@ namespace BizWebAPI.Areas.ERP.Repository.TaskManagement
                 throw new Exception(strResult);
             }
         }
-        
+
         internal async Task<IEnumerable<CmSystemUsers>> GetCompany(string userId)
         {
             try
@@ -72,7 +72,7 @@ namespace BizWebAPI.Areas.ERP.Repository.TaskManagement
                 throw new Exception(strResult);
             }
         }
-        
+
         internal async Task<IEnumerable<CmSystemUsers>> GetUsersById(string userId)
         {
             try
@@ -111,15 +111,15 @@ namespace BizWebAPI.Areas.ERP.Repository.TaskManagement
 
         internal async Task<string> CreateUsers(string empId, string comId, string loginName, string userPass, string usrActive, string email, string groupId, string branchId, DateTime passwordExpiredate, string userType)
         {
-           try
+            try
             {
                 using var conn = new SqliteConnection(_conString);
 
                 string sqlchkUserId = "select sys_usr_id from erp_cm_system_users where SYS_USR_LOGIN_NAME=:SYS_USR_LOGIN_NAME   ";
 
-                var paramChkUser = new { SYS_USR_GRP_ID = groupId, SYS_USR_LOGIN_NAME = loginName};
+                var paramChkUser = new { SYS_USR_GRP_ID = groupId, SYS_USR_LOGIN_NAME = loginName };
                 var companychkUserId = await conn.QueryAsync<CmSystemUsers>(sqlchkUserId, paramChkUser);
-                if (companychkUserId.Count() == 0 )
+                if (companychkUserId.Count() == 0)
                 {
                     string strSql = " insert into erp_cm_system_users (COMPANY_ID, SYS_USR_LOGIN_NAME,SYS_USR_DNAME, SYS_USR_PASS, USER_ACTIVE, SYS_USR_EMAIL, SYS_USR_GRP_ID, "
                                   + "CMP_BRANCH_ID, PASSWORD_EXPIRED_DATE, USER_TYPE) values (:COMPANY_ID, :SYS_USR_LOGIN_NAME,:SYS_USR_DNAME, :SYS_USR_PASS,: USER_ACTIVE,: SYS_USR_EMAIL,: SYS_USR_GRP_ID, "
@@ -135,7 +135,7 @@ namespace BizWebAPI.Areas.ERP.Repository.TaskManagement
                     string updateEmployUserIdquery = "UPDATE ERP_PR_EMPLOYEE_LIST SET SYS_USR_ID =:SYS_USR_ID  WHERE EMP_ID =: EMP_ID ";
                     var paramupdateEmployUserId = new { EMP_ID = empId, SYS_USR_ID = companyUserId.FirstOrDefault().SYS_USR_ID };
                     var updateEmployUserId = await conn.QueryAsync<CmSystemUsers>(updateEmployUserIdquery, paramupdateEmployUserId);
-                   
+
                     string querChkusrMenu = " select * from ERP_SYSTEM_USERS_ROLE_MAPPING where SYS_USER_ID =:SYS_USER_ID ";
                     var paramChkusrmenu = new { SYS_USER_ID = companyUserId.FirstOrDefault().SYS_USR_ID };
                     var ChkusrmenuMapId = await conn.QueryAsync<CmSystemUsers>(querChkusrMenu, paramChkusrmenu);
@@ -153,7 +153,7 @@ namespace BizWebAPI.Areas.ERP.Repository.TaskManagement
                 {
                     return "User already exist ";
                 }
-               
+
             }
             catch (Exception ex)
             {
@@ -169,25 +169,25 @@ namespace BizWebAPI.Areas.ERP.Repository.TaskManagement
             {
                 string strSql = " update  erp_cm_system_users set   SYS_USR_LOGIN_NAME=:SYS_USR_LOGIN_NAME,SYS_USR_DNAME=:SYS_USR_DNAME,  SYS_USR_EMAIL=: SYS_USR_EMAIL, SYS_USR_GRP_ID=:SYS_USR_GRP_ID, "
                + "CMP_BRANCH_ID=:CMP_BRANCH_ID, PASSWORD_EXPIRED_DATE=:PASSWORD_EXPIRED_DATE, USER_TYPE=:USER_TYPE, SYS_USR_PASS= :SYS_USR_PASS,USER_ACTIVE=: USER_ACTIVE where SYS_USR_ID=:SYS_USR_ID ";
-                var param = new { SYS_USR_ID = userId, COMPANY_ID = comId, SYS_USR_LOGIN_NAME = loginName, SYS_USR_DNAME= loginName, SYS_USR_PASS = userPass, USER_ACTIVE = usrActive, SYS_USR_EMAIL = email, SYS_USR_GRP_ID = groupId, CMP_BRANCH_ID = branchId, PASSWORD_EXPIRED_DATE = passwordExpiredate, USER_TYPE = userType };
+                var param = new { SYS_USR_ID = userId, COMPANY_ID = comId, SYS_USR_LOGIN_NAME = loginName, SYS_USR_DNAME = loginName, SYS_USR_PASS = userPass, USER_ACTIVE = usrActive, SYS_USR_EMAIL = email, SYS_USR_GRP_ID = groupId, CMP_BRANCH_ID = branchId, PASSWORD_EXPIRED_DATE = passwordExpiredate, USER_TYPE = userType };
                 using var conn = new SqliteConnection(_conString);
                 var employee = await conn.QueryAsync<CmSystemUsers>(strSql, param);
-               
+
                 string updateEmployUserIdquery = "UPDATE ERP_PR_EMPLOYEE_LIST SET SYS_USR_ID =:SYS_USR_ID  WHERE EMP_ID =: EMP_ID ";
                 var paramupdateEmployUserId = new { EMP_ID = empId, SYS_USR_ID = userId };
                 var updateEmployUserId = await conn.QueryAsync<CmSystemUsers>(updateEmployUserIdquery, paramupdateEmployUserId);
                 string querChkusrMenu = " select * from ERP_SYSTEM_USERS_ROLE_MAPPING where SYS_USER_ID =:SYS_USER_ID ";
                 var paramChkusrmenu = new { SYS_USER_ID = userId };
                 var ChkusrmenuMapId = await conn.QueryAsync<CmSystemUsers>(querChkusrMenu, paramChkusrmenu);
-                
-                if (ChkusrmenuMapId.Count() < 1) 
+
+                if (ChkusrmenuMapId.Count() < 1)
                 {
                     string sqlInsertUserRole = " insert into ERP_SYSTEM_USERS_ROLE_MAPPING (SYS_USER_ROLE_ID,SYS_USER_ID,IS_ACTIVE) values (:SYS_USER_ROLE_ID, :SYS_USER_ID,'Y') ";
                     var insertParamUserRoleMap = new { SYS_USER_ROLE_ID = groupId, SYS_USER_ID = userId };
 
                     var userMapId = await conn.QueryAsync<CmSystemUsers>(sqlInsertUserRole, insertParamUserRoleMap);
                 }
-               
+
                 return "User successfully updated ";
             }
             catch (Exception ex)
@@ -313,38 +313,38 @@ namespace BizWebAPI.Areas.ERP.Repository.TaskManagement
             try
             {
                 string strSql = "";
-        //        strSql = @" ((SELECT distinct  SM.SYS_MENU_ID, SM.SYS_MENU_TITLE , SM.SYS_MENU_FILE, SM.PATH_NAME, SM.SYS_MENU_PARENT,SM.SYS_MENU_TYPE,SM.MENU_ICON,SYS_MENU_SERIAL
-        //                   FROM ERP_USR_ROLE_MENU_MAPPING  URMM
-        //                  left join ERP_SYSTEM_USERS_ROLE_MAPPING URM ON URM.SYS_USER_ROLE_MAP_ID = URMM.SYS_USER_ROLE_MAP_ID
-        //                   LEFT JOIN  ERP_CM_SYSTEM_MENU SM  ON SM.SYS_MENU_ID = URMM.SYS_MENU_ID
-        //                  where URM.SYS_USER_ID = :SYS_USR_ID AND URMM.IS_ACTIVE='Y' ) 
-        //                 union
-        //                   select  SYS_MENU_ID, SYS_MENU_TITLE , SYS_MENU_FILE, PATH_NAME, SYS_MENU_PARENT,SYS_MENU_TYPE,MENU_ICON,SYS_MENU_SERIAL  from ERP_CM_SYSTEM_MENU where   SYS_MENU_ID in
-        //                  ( select  SYS_MENU_PARENT   from ERP_CM_SYSTEM_MENU where  SYS_MENU_ID in   (select SYS_MENU_PARENT from (select  * FROM ERP_USR_ROLE_MENU_MAPPING  URMM
-        //               left join ERP_SYSTEM_USERS_ROLE_MAPPING URM ON URM.SYS_USER_ROLE_MAP_ID = URMM.SYS_USER_ROLE_MAP_ID   LEFT JOIN  ERP_CM_SYSTEM_MENU SM  ON SM.SYS_MENU_ID = URMM.SYS_MENU_ID 
-        //             where URM.sys_user_id = :SYS_USR_ID AND URMM.IS_ACTIVE='Y'  )  ) ) 
-        //                  union
-        //     select  SYS_MENU_ID, SYS_MENU_TITLE , SYS_MENU_FILE, PATH_NAME, SYS_MENU_PARENT,SYS_MENU_TYPE,MENU_ICON ,SYS_MENU_SERIAL from ERP_CM_SYSTEM_MENU where   SYS_MENU_ID in
-        //     (     (select SYS_MENU_PARENT from (select  * FROM ERP_USR_ROLE_MENU_MAPPING  URMM    left join ERP_SYSTEM_USERS_ROLE_MAPPING URM ON URM.SYS_USER_ROLE_MAP_ID = URMM.SYS_USER_ROLE_MAP_ID
-        //        LEFT JOIN  ERP_CM_SYSTEM_MENU SM  ON SM.SYS_MENU_ID = URMM.SYS_MENU_ID   where URM.sys_user_id = :SYS_USR_ID AND URMM.IS_ACTIVE='Y'  )  ) ) )
-        //order by SYS_MENU_SERIAL asc ";
-                      strSql = @" select * from (  select * from ( SELECT distinct SM.SYS_MENU_ID, SM.SYS_MENU_TITLE , SM.SYS_MENU_FILE, SM.PATH_NAME, SM.SYS_MENU_PARENT,SM.SYS_MENU_TYPE,SM.MENU_ICON,SYS_MENU_SERIAL
+                //        strSql = @" ((SELECT distinct  SM.SYS_MENU_ID, SM.SYS_MENU_TITLE , SM.SYS_MENU_FILE, SM.PATH_NAME, SM.SYS_MENU_PARENT,SM.SYS_MENU_TYPE,SM.MENU_ICON,SYS_MENU_SERIAL
+                //                   FROM ERP_USR_ROLE_MENU_MAPPING  URMM
+                //                  left join ERP_SYSTEM_USERS_ROLE_MAPPING URM ON URM.SYS_USER_ROLE_MAP_ID = URMM.SYS_USER_ROLE_MAP_ID
+                //                   LEFT JOIN  ERP_CM_SYSTEM_MENU SM  ON SM.SYS_MENU_ID = URMM.SYS_MENU_ID
+                //                  where URM.SYS_USER_ID = :SYS_USR_ID AND URMM.IS_ACTIVE='Y' ) 
+                //                 union
+                //                   select  SYS_MENU_ID, SYS_MENU_TITLE , SYS_MENU_FILE, PATH_NAME, SYS_MENU_PARENT,SYS_MENU_TYPE,MENU_ICON,SYS_MENU_SERIAL  from ERP_CM_SYSTEM_MENU where   SYS_MENU_ID in
+                //                  ( select  SYS_MENU_PARENT   from ERP_CM_SYSTEM_MENU where  SYS_MENU_ID in   (select SYS_MENU_PARENT from (select  * FROM ERP_USR_ROLE_MENU_MAPPING  URMM
+                //               left join ERP_SYSTEM_USERS_ROLE_MAPPING URM ON URM.SYS_USER_ROLE_MAP_ID = URMM.SYS_USER_ROLE_MAP_ID   LEFT JOIN  ERP_CM_SYSTEM_MENU SM  ON SM.SYS_MENU_ID = URMM.SYS_MENU_ID 
+                //             where URM.sys_user_id = :SYS_USR_ID AND URMM.IS_ACTIVE='Y'  )  ) ) 
+                //                  union
+                //     select  SYS_MENU_ID, SYS_MENU_TITLE , SYS_MENU_FILE, PATH_NAME, SYS_MENU_PARENT,SYS_MENU_TYPE,MENU_ICON ,SYS_MENU_SERIAL from ERP_CM_SYSTEM_MENU where   SYS_MENU_ID in
+                //     (     (select SYS_MENU_PARENT from (select  * FROM ERP_USR_ROLE_MENU_MAPPING  URMM    left join ERP_SYSTEM_USERS_ROLE_MAPPING URM ON URM.SYS_USER_ROLE_MAP_ID = URMM.SYS_USER_ROLE_MAP_ID
+                //        LEFT JOIN  ERP_CM_SYSTEM_MENU SM  ON SM.SYS_MENU_ID = URMM.SYS_MENU_ID   where URM.sys_user_id = :SYS_USR_ID AND URMM.IS_ACTIVE='Y'  )  ) ) )
+                //order by SYS_MENU_SERIAL asc ";
+                strSql = @" select * from (  select * from ( SELECT distinct SM.SYS_MENU_ID, SM.SYS_MENU_TITLE , SM.SYS_MENU_FILE, SM.PATH_NAME, SM.SYS_MENU_PARENT,SM.SYS_MENU_TYPE,SM.MENU_ICON,SYS_MENU_SERIAL
                                           FROM ERP_USR_ROLE_MENU_MAPPING URMM
                           left join ERP_SYSTEM_USERS_ROLE_MAPPING URM ON URM.SYS_USER_ROLE_MAP_ID = URMM.SYS_USER_ROLE_MAP_ID
                            LEFT JOIN  ERP_CM_SYSTEM_MENU SM  ON SM.SYS_MENU_ID = URMM.SYS_MENU_ID
-                          where URM.SYS_USER_ID = '"+userId+"' AND URMM.IS_ACTIVE = 'Y' ) where SYS_MENU_ID NOTNULL  " + @"
+                          where URM.SYS_USER_ID = '" + userId + "' AND URMM.IS_ACTIVE = 'Y' ) where SYS_MENU_ID NOTNULL  " + @"
 		                 UNION
 		     			  select  SYS_MENU_ID, SYS_MENU_TITLE , SYS_MENU_FILE, PATH_NAME, SYS_MENU_PARENT,SYS_MENU_TYPE,MENU_ICON,SYS_MENU_SERIAL from ERP_CM_SYSTEM_MENU where   SYS_MENU_ID in
                           (select  SYS_MENU_PARENT from ERP_CM_SYSTEM_MENU where  SYS_MENU_ID in   (select SYS_MENU_PARENT from(select* FROM ERP_USR_ROLE_MENU_MAPPING URMM
 
                           left join ERP_SYSTEM_USERS_ROLE_MAPPING URM ON URM.SYS_USER_ROLE_MAP_ID = URMM.SYS_USER_ROLE_MAP_ID   LEFT JOIN  ERP_CM_SYSTEM_MENU SM  ON SM.SYS_MENU_ID = URMM.SYS_MENU_ID 
 
-                             where URM.sys_user_id = '"+userId+"' AND URMM.IS_ACTIVE = 'Y'  )  ) )  union   "+ @"
+                             where URM.sys_user_id = '" + userId + "' AND URMM.IS_ACTIVE = 'Y'  )  ) )  union   " + @"
                                       
                           select  SYS_MENU_ID, SYS_MENU_TITLE , SYS_MENU_FILE, PATH_NAME, SYS_MENU_PARENT,SYS_MENU_TYPE,MENU_ICON ,SYS_MENU_SERIAL from ERP_CM_SYSTEM_MENU where   SYS_MENU_ID in
                          ( select DISTINCT SYS_MENU_PARENT from(select* FROM ERP_USR_ROLE_MENU_MAPPING URMM    left join ERP_SYSTEM_USERS_ROLE_MAPPING URM ON URM.SYS_USER_ROLE_MAP_ID = URMM.SYS_USER_ROLE_MAP_ID
 
-                         LEFT JOIN  ERP_CM_SYSTEM_MENU SM  ON SM.SYS_MENU_ID = URMM.SYS_MENU_ID   where URM.sys_user_id = '"+userId+"' AND URMM.IS_ACTIVE = 'Y'  )   )  order by SYS_MENU_PARENT asc ) ";
+                         LEFT JOIN  ERP_CM_SYSTEM_MENU SM  ON SM.SYS_MENU_ID = URMM.SYS_MENU_ID   where URM.sys_user_id = '" + userId + "' AND URMM.IS_ACTIVE = 'Y'  )   )  order by SYS_MENU_PARENT asc ) ";
                 var param = new { SYS_USR_ID = userId };
                 using var conn = new SqliteConnection(_conString);
                 var menuData = await conn.QueryAsync<CmSystemAccessPolicy>(strSql, null);
@@ -378,7 +378,7 @@ namespace BizWebAPI.Areas.ERP.Repository.TaskManagement
             }
         }
 
-        internal async Task<string> InsertSystemMenu(string userId, string parentMenuId, string menuTitle, string pathName, string menuType,string menuIcon, string menuSerial)
+        internal async Task<string> InsertSystemMenu(string userId, string parentMenuId, string menuTitle, string pathName, string menuType, string menuIcon, string menuSerial)
         {
             string strSqlCompany = "";
             string inserMenuSql = "";
@@ -391,7 +391,7 @@ namespace BizWebAPI.Areas.ERP.Repository.TaskManagement
                 var softwarePkgId = softwarePackage.FirstOrDefault().SOFT_PKG_ID;
 
                 inserMenuSql = " INSERT INTO ERP_CM_SYSTEM_MENU (SYS_MENU_TITLE,SYS_MENU_TYPE, PATH_NAME,CMP_BRANCH_ID,SYS_MENU_PARENT,SOFT_PKG_ID,MENU_ICON,SYS_MENU_SERIAL ) VALUES (:SYS_MENU_TITLE,:SYS_MENU_TYPE,:PATH_NAME,:CMP_BRANCH_ID,:SYS_MENU_PARENT,:SOFT_PKG_ID, :MENU_ICON,:SYS_MENU_SERIAL  ) ";
-                var paramMenu = new { SYS_MENU_PARENT = parentMenuId, SYS_MENU_TITLE = menuTitle, PATH_NAME = pathName, SOFT_PKG_ID = softwarePkgId, SYS_MENU_TYPE = menuType, SYS_MENU_SERIAL = menuSerial, CMP_BRANCH_ID = softwarePackage.FirstOrDefault().CMP_BRANCH_ID , MENU_ICON=menuIcon };
+                var paramMenu = new { SYS_MENU_PARENT = parentMenuId, SYS_MENU_TITLE = menuTitle, PATH_NAME = pathName, SOFT_PKG_ID = softwarePkgId, SYS_MENU_TYPE = menuType, SYS_MENU_SERIAL = menuSerial, CMP_BRANCH_ID = softwarePackage.FirstOrDefault().CMP_BRANCH_ID, MENU_ICON = menuIcon };
                 var insertmenuData = await conn.QueryAsync<CmSystemAccessPolicy>(inserMenuSql, paramMenu);
 
                 return "record saved ";
@@ -516,7 +516,7 @@ namespace BizWebAPI.Areas.ERP.Repository.TaskManagement
             }
         }
 
-        internal async Task<IEnumerable<CmSystemAccessPolicy>> GetMenuByGroup(string menuId,string userId)
+        internal async Task<IEnumerable<CmSystemAccessPolicy>> GetMenuByGroup(string menuId, string userId)
         {
             string sQl = "";
             string strSqlCompany = "";
@@ -538,7 +538,7 @@ namespace BizWebAPI.Areas.ERP.Repository.TaskManagement
                     sQl = " SELECT SM.* FROM ERP_CM_SYSTEM_MENU SM  where SOFT_PKG_ID = :SOFT_PKG_ID " +
                         " order by SYS_MENU_ID  desc   ";
                 }
-                var param = new { MENU_ID = menuId, SOFT_PKG_ID= softwarePkgId };
+                var param = new { MENU_ID = menuId, SOFT_PKG_ID = softwarePkgId };
                 var menuData = await conn.QueryAsync<CmSystemAccessPolicy>(sQl, param);
                 return menuData;
             }
@@ -550,7 +550,7 @@ namespace BizWebAPI.Areas.ERP.Repository.TaskManagement
 
         }
 
-        internal async Task<string> UpdateSystemMenuById(string userId, string decrypMenuId,string decryptMenuFile,string decryptMenuTitle, string menuIcon,string menuSerial)
+        internal async Task<string> UpdateSystemMenuById(string userId, string decrypMenuId, string decryptMenuFile, string decryptMenuTitle, string menuIcon, string menuSerial)
         {
             string strSqlCompany = "";
             string sqlMenuById = "";
@@ -562,13 +562,13 @@ namespace BizWebAPI.Areas.ERP.Repository.TaskManagement
                 var softwarePackage = await conn.QueryAsync<CmSystemUsers>(strSqlCompany, paramPackageId);
                 var softwarePkgId = softwarePackage.FirstOrDefault().SOFT_PKG_ID;
 
-                var param = new { SYS_MENU_ID = decrypMenuId, SYS_MENU_TITLE= decryptMenuTitle, PATH_NAME= decryptMenuFile, MENU_ICON= menuIcon, SYS_MENU_SERIAL= menuSerial, SOFT_PKG_ID = softwarePkgId };
+                var param = new { SYS_MENU_ID = decrypMenuId, SYS_MENU_TITLE = decryptMenuTitle, PATH_NAME = decryptMenuFile, MENU_ICON = menuIcon, SYS_MENU_SERIAL = menuSerial, SOFT_PKG_ID = softwarePkgId };
 
                 sqlMenuById = " UPDATE ERP_CM_SYSTEM_MENU SM  SET SYS_MENU_TITLE=:SYS_MENU_TITLE,PATH_NAME=:PATH_NAME,MENU_ICON=:MENU_ICON,SOFT_PKG_ID=:SOFT_PKG_ID,SYS_MENU_SERIAL=:SYS_MENU_SERIAL  WHERE SYS_MENU_ID =:SYS_MENU_ID  ";
-                
+
                 var updateMenuData = await conn.QueryAsync<CmSystemAccessPolicy>(sqlMenuById, param);
 
-                
+
                 return " Successfully Updated ";
             }
             catch (Exception ex)
@@ -585,35 +585,67 @@ namespace BizWebAPI.Areas.ERP.Repository.TaskManagement
             {
                 using var conn = new SqliteConnection(_conString);
 
-                string strSqlCompany = " select COM.SOFT_PKG_ID,CB.CMP_BRANCH_ID from ERP_CM_COMPANY COM,ERP_CM_SYSTEM_USERS SU,ERP_CM_CMP_BRANCH CB where SU.COMPANY_ID= COM.COMPANY_ID AND CB.CMP_COMPANY_ID=COM.PARENT_ID AND CB.CMP_BRANCH_TYPE_ID='A' and SU.sys_usr_id=:sys_usr_id  ";
-                var paramPackageId = new { sys_usr_id = userId };
-                var softwarePackage = await conn.QueryAsync<CmSystemUsers>(strSqlCompany, paramPackageId);
-                var softwarePkgId = softwarePackage.FirstOrDefault().SOFT_PKG_ID;
+                //string strSqlCompany = " select COM.SOFT_PKG_ID,CB.CMP_BRANCH_ID from ERP_CM_COMPANY COM,ERP_CM_SYSTEM_USERS SU,ERP_CM_CMP_BRANCH CB where SU.COMPANY_ID= COM.COMPANY_ID AND CB.CMP_COMPANY_ID=COM.PARENT_ID AND CB.CMP_BRANCH_TYPE_ID='A' and SU.sys_usr_id=:sys_usr_id  ";
+                //var paramPackageId = new { sys_usr_id = userId };
+                //var softwarePackage = await conn.QueryAsync<CmSystemUsers>(strSqlCompany, paramPackageId);
+                //var softwarePkgId = softwarePackage.FirstOrDefault().SOFT_PKG_ID;
                 //sQl = "SELECT DISTINCT CSM.SYS_MENU_ID, CSM.SYS_MENU_TITLE, CSM.SYS_MENU_PARENT, CSM.SYS_MENU_TYPE, DECODE(URMM.IS_ACTIVE,'Y','Y','N') IS_ACTIVE " +
                 //    "FROM ERP_SYSTEM_ROLE_MENU_MAPPING SRMM, ERP_USR_ROLE_MENU_MAPPING URMM, ERP_SYSTEM_USERS_ROLE_MAPPING SURM, ERP_CM_SYSTEM_USERS CSU, " +
                 //    "ERP_CM_SYSTEM_MENU CSM WHERE URMM.SYS_MENU_ID(+) = SRMM.SYS_MENU_ID AND URMM.SYS_USER_ROLE_ID = SURM.SYS_USER_ROLE_ID(+)  " +
                 //    "AND SURM.SYS_USER_ID = CSU.SYS_USR_ID(+) AND SRMM.SYS_MENU_ID = CSM.SYS_MENU_ID AND CSU.SYS_USR_ID(+) = '"+ userId + "' ";
-                sQl =@" ((SELECT distinct SM.SYS_MENU_ID, SM.SYS_MENU_TITLE , SM.SYS_MENU_PARENT,SM.SYS_MENU_TYPE,URMM.IS_ACTIVE
-                           FROM ERP_USR_ROLE_MENU_MAPPING URMM
-                          left join ERP_SYSTEM_USERS_ROLE_MAPPING URM ON URM.SYS_USER_ROLE_MAP_ID = URMM.SYS_USER_ROLE_MAP_ID
-                           LEFT JOIN  ERP_CM_SYSTEM_MENU SM  ON SM.SYS_MENU_ID = URMM.SYS_MENU_ID
-                          where URM.SYS_USER_ID = '"+userId+"'  AND URMM.IS_ACTIVE = 'Y' ) "+
-                      @"    union
-                     select  SYS_MENU_ID, SYS_MENU_TITLE ,SYS_MENU_PARENT,SYS_MENU_TYPE,'Y' IS_ACTIVE from ERP_CM_SYSTEM_MENU where   SYS_MENU_ID in
-                   ((select SYS_MENU_PARENT from(select* FROM ERP_USR_ROLE_MENU_MAPPING URMM    left join ERP_SYSTEM_USERS_ROLE_MAPPING URM ON URM.SYS_USER_ROLE_MAP_ID = URMM.SYS_USER_ROLE_MAP_ID
-                   LEFT JOIN  ERP_CM_SYSTEM_MENU SM  ON SM.SYS_MENU_ID = URMM.SYS_MENU_ID)  ) ) )
-                  union
-                    (  SELECT distinct  SM.SYS_MENU_ID, SM.SYS_MENU_TITLE, SM.SYS_MENU_PARENT, SM.SYS_MENU_TYPE, 'N' IS_ACTIVE
-                 FROM  ERP_CM_SYSTEM_MENU SM  where SM.SOFT_PKG_ID  = '"+ softwarePkgId + "' "+
-                 @" and SM.SYS_MENU_ID not in  ((SELECT distinct SM.SYS_MENU_ID  FROM ERP_USR_ROLE_MENU_MAPPING URMM
-                left join ERP_SYSTEM_USERS_ROLE_MAPPING URM ON URM.SYS_USER_ROLE_MAP_ID = URMM.SYS_USER_ROLE_MAP_ID LEFT JOIN  ERP_CM_SYSTEM_MENU SM  ON SM.SYS_MENU_ID = URMM.SYS_MENU_ID "+
-                " where URM.SYS_USER_ID =  '" + userId + "'   AND URMM.IS_ACTIVE = 'Y' )  union "+
-               @" select  SYS_MENU_ID from ERP_CM_SYSTEM_MENU where   SYS_MENU_ID in ((select SYS_MENU_PARENT from(select* FROM ERP_USR_ROLE_MENU_MAPPING URMM  
-               left join ERP_SYSTEM_USERS_ROLE_MAPPING URM ON URM.SYS_USER_ROLE_MAP_ID = URMM.SYS_USER_ROLE_MAP_ID
-               LEFT JOIN  ERP_CM_SYSTEM_MENU SM  ON SM.SYS_MENU_ID = URMM.SYS_MENU_ID)  ) ) ) )";
+                sQl = @"SELECT distinct SM.SYS_MENU_ID, SM.SYS_MENU_TITLE, SM.SYS_MENU_PARENT, SM.SYS_MENU_TYPE,
+CASE
+    WHEN URMM.IS_ACTIVE = 'Y' THEN 'Y'
+    ELSE 'N'
+END AS IS_ACTIVE
+FROM ERP_USR_ROLE_MENU_MAPPING URMM
+LEFT JOIN ERP_SYSTEM_USERS_ROLE_MAPPING URM ON URM.SYS_USER_ROLE_MAP_ID = URMM.SYS_USER_ROLE_MAP_ID
+LEFT JOIN ERP_CM_SYSTEM_MENU SM ON SM.SYS_MENU_ID = URMM.SYS_MENU_ID
+WHERE URM.SYS_USER_ID = :sys_usr_id 
 
-                // var param = new { SYS_USR_ID = userId };
-                var menuData = await conn.QueryAsync<RoleWiseMenu>(sQl, null);
+UNION
+
+SELECT SYS_MENU_ID, SYS_MENU_TITLE, SYS_MENU_PARENT, SYS_MENU_TYPE, 'Y' AS IS_ACTIVE
+FROM ERP_CM_SYSTEM_MENU
+WHERE SYS_MENU_ID IN (
+    SELECT SYS_MENU_PARENT
+    FROM (
+        SELECT *
+        FROM ERP_USR_ROLE_MENU_MAPPING URMM
+        LEFT JOIN ERP_SYSTEM_USERS_ROLE_MAPPING URM ON URM.SYS_USER_ROLE_MAP_ID = URMM.SYS_USER_ROLE_MAP_ID
+        LEFT JOIN ERP_CM_SYSTEM_MENU SM ON SM.SYS_MENU_ID = URMM.SYS_MENU_ID
+    )
+)
+
+UNION
+
+SELECT distinct SM.SYS_MENU_ID, SM.SYS_MENU_TITLE, SM.SYS_MENU_PARENT, SM.SYS_MENU_TYPE, 'N' AS IS_ACTIVE
+FROM ERP_CM_SYSTEM_MENU SM
+WHERE SM.SOFT_PKG_ID = '10081411060000000'
+AND SM.SYS_MENU_ID NOT IN (
+    SELECT distinct SM.SYS_MENU_ID
+    FROM ERP_USR_ROLE_MENU_MAPPING URMM
+    LEFT JOIN ERP_SYSTEM_USERS_ROLE_MAPPING URM ON URM.SYS_USER_ROLE_MAP_ID = URMM.SYS_USER_ROLE_MAP_ID
+    LEFT JOIN ERP_CM_SYSTEM_MENU SM ON SM.SYS_MENU_ID = URMM.SYS_MENU_ID
+    WHERE URM.SYS_USER_ID =:sys_usr_id AND URMM.IS_ACTIVE = 'Y'
+)
+AND SM.SYS_MENU_ID NOT IN (
+    SELECT SYS_MENU_ID
+    FROM ERP_CM_SYSTEM_MENU
+    WHERE SYS_MENU_ID IN (
+        SELECT SYS_MENU_PARENT
+        FROM (
+            SELECT *
+            FROM ERP_USR_ROLE_MENU_MAPPING URMM
+            LEFT JOIN ERP_SYSTEM_USERS_ROLE_MAPPING URM ON URM.SYS_USER_ROLE_MAP_ID = URMM.SYS_USER_ROLE_MAP_ID
+            LEFT JOIN ERP_CM_SYSTEM_MENU SM ON SM.SYS_MENU_ID = URMM.SYS_MENU_ID
+        )
+    )
+)
+";
+
+                var param = new { sys_usr_id = userId };
+                var menuData = await conn.QueryAsync<RoleWiseMenu>(sQl, param);
                 return menuData;
             }
             catch (Exception ex)
@@ -632,37 +664,40 @@ namespace BizWebAPI.Areas.ERP.Repository.TaskManagement
                 var param = new { SYS_USER_ID = decrypUserId };
                 using var conn = new SqliteConnection(_conString);
                 var userRoleMapId = await conn.QuerySingleAsync<SystemUserRoleMapping>(sQl, param);
-                if(userRoleMapId != null)
+                if (userRoleMapId != null)
                 {
                     var existingData = "select * from ERP_USR_ROLE_MENU_MAPPING Where SYS_USER_ROLE_MAP_ID=:SYS_USER_ROLE_MAP_ID ";
                     var existingDataParm = new { SYS_USER_ROLE_MAP_ID = userRoleMapId.SYS_USER_ROLE_MAP_ID };
                     var existing = await conn.QueryAsync<SystemUsersRoleMenuMapping>(existingData, existingDataParm);
 
-                    if(existing.Count() > 0)
+                    if (existing.Count() > 0)
                     {
                         var userMenu = "update ERP_USR_ROLE_MENU_MAPPING set IS_ACTIVE='N' Where SYS_USER_ROLE_MAP_ID=:SYS_USER_ROLE_MAP_ID ";
                         var userMenuParm = new { SYS_USER_ROLE_MAP_ID = userRoleMapId.SYS_USER_ROLE_MAP_ID };
                         await conn.QueryAsync<SystemUsersRoleMenuMapping>(userMenu, userMenuParm);
-                    }                    
+                    }
 
                     foreach (var menu in decryptMenuList)
                     {
                         var existingMenuSql = " select * from ERP_USR_ROLE_MENU_MAPPING where SYS_MENU_ID=:SYS_MENU_ID AND SYS_USER_ROLE_ID=:SYS_USER_ROLE_ID AND SYS_USER_ROLE_MAP_ID=:SYS_USER_ROLE_MAP_ID ";
-                        var existingMenuParam = new { SYS_MENU_ID = menu,
-                                                    SYS_USER_ROLE_ID = userRoleMapId.SYS_USER_ROLE_ID,
-                                                    SYS_USER_ROLE_MAP_ID = userRoleMapId.SYS_USER_ROLE_MAP_ID
-                                                    };
+                        var existingMenuParam = new
+                        {
+                            SYS_MENU_ID = menu,
+                            SYS_USER_ROLE_ID = userRoleMapId.SYS_USER_ROLE_ID,
+                            SYS_USER_ROLE_MAP_ID = userRoleMapId.SYS_USER_ROLE_MAP_ID
+                        };
                         var existingMenu = await conn.QueryAsync<SystemUserRoleMapping>(existingMenuSql, existingMenuParam);
 
                         if (existingMenu.Count() > 0)
                         {
                             var menuSql = " update ERP_USR_ROLE_MENU_MAPPING set IS_ACTIVE='Y' where SYS_MENU_ID=:SYS_MENU_ID AND SYS_USER_ROLE_ID=:SYS_USER_ROLE_ID AND" +
                                         " SYS_USER_ROLE_MAP_ID=:SYS_USER_ROLE_MAP_ID  ";
-                            var menuParam = new {
-                                                SYS_MENU_ID = menu,
-                                                SYS_USER_ROLE_ID = userRoleMapId.SYS_USER_ROLE_ID,
-                                                SYS_USER_ROLE_MAP_ID = userRoleMapId.SYS_USER_ROLE_MAP_ID
-                                                };
+                            var menuParam = new
+                            {
+                                SYS_MENU_ID = menu,
+                                SYS_USER_ROLE_ID = userRoleMapId.SYS_USER_ROLE_ID,
+                                SYS_USER_ROLE_MAP_ID = userRoleMapId.SYS_USER_ROLE_MAP_ID
+                            };
                             await conn.QueryAsync<SystemUsersRoleMenuMapping>(menuSql, menuParam);
                         }
                         else
