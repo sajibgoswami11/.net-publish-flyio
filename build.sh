@@ -1,5 +1,4 @@
 #!/bin/bash
 
-RUN dotnet publish "BizWebAPI.csproj" -c Release -o /app/publish
-COPY app.db /app/publish
-RUN dotnet /app/publish/BizWebAPI.dll
+docker build -t my-app -f Dockerfile .
+docker run -p 5000:5000 my-app
