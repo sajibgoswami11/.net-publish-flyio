@@ -1,3 +1,3 @@
 #!/bin/bash
 
-dotnet publish "BizWebAPI.csproj" -c Release  && cp app.db /bin/Release/netcoreapp3.1/ && export ASPNETCORE_URLS=http://+:5003 
+dotnet publish "BizWebAPI.csproj" -c Release /output && cp app.db /output && export ASPNETCORE_URLS=http://+:5003 
