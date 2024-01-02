@@ -126,7 +126,7 @@ namespace BizWebAPI.Areas.ERP.Repository
             }
             if (_mode.Equals(EncryptMode.DECRYPT))
             {
-                //decrypt .Replace('/', '%')
+                //decrypt.Replace('/', '%');
                 byte[] plainText = _rcipher.CreateDecryptor().TransformFinalBlock(Convert.FromBase64String(_inputText), 0, Convert.FromBase64String(_inputText).Length);
                 _out = _enc.GetString(plainText);
             }

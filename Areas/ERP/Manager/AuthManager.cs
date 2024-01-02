@@ -38,11 +38,11 @@ namespace BizWebAPI.Areas.ERP.Manager
             {
                 var userDetails = await GetKey.GetSecurityKey(httpContext);
                 _commonRepository = new CommonRepository();
-                string decryptUsername = await _commonRepository.Decrypt(strUsername, userDetails.SecurityKey);
-                string decryptPassword = await _commonRepository.Decrypt(strPassword, userDetails.SecurityKey);
+                //string decryptUsername = await _commonRepository.Decrypt(strUsername, userDetails.SecurityKey);
+                //string decryptPassword = await _commonRepository.Decrypt(strPassword, userDetails.SecurityKey);
 
                 _authRepository = new AuthRepository();
-                var loginDetails = await _authRepository.Login(decryptUsername, decryptPassword);
+                var loginDetails = await _authRepository.Login(strUsername, strPassword);
                 var user = _mapper.Map<ErpAuthLoginDto>(loginDetails);
 
                 if (user != null)
